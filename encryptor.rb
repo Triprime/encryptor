@@ -1,28 +1,69 @@
 class Encryptor
-  def encrypt_letter(letter)
-    lowercase_letter = letter.downcase
-    cipher[lowercase_letter]
+
+  def encrypt_letter(letter, rotation)
+    cipher(rotation)[letter]
   end
 
-  def encrypt(string)
+
+  def encrypt(string, rotation)
     letters = string.split ('')
-    
+
     encrypted_letters = letters.collect do |character|
-      encrypt_letter(character)
+      encrypt_letter(character, rotation)
     end
 
     encrypted_letters.join
-
-
   end
 
 
-  def cipher
-    {'a' => 'n', 'b' => 'o', 'c' => 'p', 'c' => 'q',
-     'e' => 'r', 'f' => 's', 'g' => 't', 'h' => 'u',
-     'i' => 'v', 'j' => 'w', 'k' => 'x', 'l' => 'y', 
-     'm' => 'z', 'n' => 'a', 'o' => 'b', 'p' => 'c',
-     'q' => 'd', 'r' => 'e', 's' => 'f', 't' => 'g', 'u'=> 'h', 
-     'v' => 'i', 'w' => 'j', 'x' => 'k', 'y' => 'l', 'z'=> 'm' }
+  # alias_method :decrypt, :encrypt
+  def decrypt(string, rotation)
+    encrypt(string, -rotation)
   end
+
+  
+  def cipher(rotation)
+    # key string
+    letters = (' '..'z').to_a
+    # value string
+    rotated_letters = letters.rotate(rotation)
+
+    # zip strings and put in hash
+    pairs = letters.zip(rotated_letters) 
+    Hash[pairs]
+  end
+
+  def encrypt_file (filename, rotation)
+    #Create the file handle to the input file
+    input = File.open("secret.txt","r")
+    #Read the text of the input file
+    content = input.read
+    #Encrypt the text
+    encrypted_text = encrypt(content, rotation)
+    #Create a name for the output file
+    #Create an output file handle
+    out = File.open("secret.txt.encrypted", "w") 
+    #Write out the text
+    out.write(encrypted_text)
+    #Close the file
+    out.close
+  end
+
+  def decrypt_file (filename, rotation)
+    #Create the file handle to the input file
+    input = File.open("secret.txt.encrypted","r")
+    #Read the text of the input file
+    content = input.read
+    #Decrypt the text
+    decrypted_text = decrypt(content, rotation)
+    #Create a name for the output file
+    output_filename = filename.gsub("encrypted", "decrypted")
+    #Create an output file handle
+    out = File.open(output_filename, "w") 
+    #Write out the text
+    out.write(decrypted_text)
+    #Close the file
+    out.close
+  end
+
 end
